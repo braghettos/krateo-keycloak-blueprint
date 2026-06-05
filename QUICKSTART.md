@@ -164,11 +164,6 @@ metadata: { name: keycloak-admin, namespace: krateo-system }
 spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
 ---
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
-kind: KeycloakProtocolMapperConfiguration
-metadata: { name: keycloak-admin, namespace: krateo-system }
-spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
----
-apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakGroupConfiguration
 metadata: { name: keycloak-admin, namespace: krateo-system }
 spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
@@ -203,6 +198,17 @@ spec:
   redirectUris:
     - "https://<KEYSTONE_HOST>/v3/auth/OS-FEDERATION/identity_providers/keycloak/protocols/openid/websso"
     - "https://<KEYSTONE_HOST>/redirect_uri"
+  # groups mapper declared INLINE — fully declarative, no client UUID needed.
+  protocolMappers:
+    - name: groups
+      protocol: openid-connect
+      protocolMapper: oidc-group-membership-mapper
+      config:
+        "claim.name": "groups"
+        "full.path": "false"
+        "id.token.claim": "true"
+        "access.token.claim": "true"
+        "userinfo.token.claim": "true"
 ---
 # Krateo portal login client
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
@@ -219,26 +225,6 @@ spec:
   standardFlowEnabled: true
   clientAuthenticatorType: client-secret
   redirectUris: [ "https://<KRATEO_HOST>/auth/oidc" ]
----
-# groups membership mapper on the keystone client — the claim BOTH apps consume.
-# clientUuid is the keystone client's server-generated UUID: read it from the
-# KeycloakClient/keystone status.id once that client reconciles, then set it here.
-apiVersion: keycloak.ogen.krateo.io/v1alpha1
-kind: KeycloakProtocolMapper
-metadata: { name: keystone-groups, namespace: krateo-system }
-spec:
-  configurationRef: { name: keycloak-admin, namespace: krateo-system }
-  realm: krateo
-  clientUuid: "<KEYSTONE_CLIENT_UUID>"
-  name: groups
-  protocol: openid-connect
-  protocolMapper: oidc-group-membership-mapper
-  config:
-    "claim.name": "groups"
-    "full.path": "false"
-    "id.token.claim": "true"
-    "access.token.claim": "true"
-    "userinfo.token.claim": "true"
 ---
 # An OpenStack project group; the Keystone mapping turns membership into a
 # project/role grant.
