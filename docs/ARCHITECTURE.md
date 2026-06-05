@@ -23,8 +23,8 @@ Horizon** (shared Keycloak SSO session — no token bridging).
 
 | Dir | Role | Tech |
 | --- | --- | --- |
-| [`krateo-keycloack-blueprint/`](https://github.com/braghettos/krateo-keycloack-blueprint) | **Lifecycle** — deploy/manage the Keycloak server | Krateo `CompositionDefinition` → chart → official Keycloak Operator (`Keycloak` CR) |
-| [`krateo-keycloack-operator-kog/`](https://github.com/braghettos/krateo-keycloack-operator-kog) | **Configuration** — Keycloak Admin API resources as CRs | KOG (`oasgen-provider` + `rest-dynamic-controller`) over Keycloak's official OAS 3.0.3 |
+| [`krateo-keycloak-blueprint/`](https://github.com/braghettos/krateo-keycloak-blueprint) | **Lifecycle** — deploy/manage the Keycloak server | Krateo `CompositionDefinition` → chart → official Keycloak Operator (`Keycloak` CR) |
+| [`krateo-keycloak-operator-kog/`](https://github.com/braghettos/krateo-keycloak-operator-kog) | **Configuration** — Keycloak Admin API resources as CRs | KOG (`oasgen-provider` + `rest-dynamic-controller`) over Keycloak's official OAS 3.0.3 |
 
 They connect at exactly one point: the bearer **`keycloak-admin-token`** Secret
 (minted/rotated by External Secrets Operator) that the config KOG uses to call
@@ -61,7 +61,7 @@ the server the blueprint stands up.
 
 Both charts `helm lint` clean and `helm template` to valid manifests. The KOG's
 runtime behaviour against `rest-dynamic-controller` is **not yet validated** —
-see the krateo-keycloack-operator-kog README → "Validation status" for the spike checklist
+see the krateo-keycloak-operator-kog README → "Validation status" for the spike checklist
 (start with `KeycloakClient` only). `_reference/` holds the upstream OAS and the
 asset generator.
 
