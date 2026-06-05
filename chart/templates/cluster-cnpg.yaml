@@ -1,0 +1,31 @@
+{{- if eq .Values.db.provider "cloudnativepg" }}
+{{- /*
+CloudNativePG Cluster backing the Keycloak server. CNPG bootstraps the
+`{{ .Values.db.database }}` database owned by `{{ .Values.db.cloudnativepg.owner }}`
+and publishes:
+  - Secret  {{ .Values.db.cloudnativepg.clusterName }}-app  (keys: username, password, dbname, host, port, uri, ...)
+  - Service {{ .Values.db.cloudnativepg.clusterName }}-rw   (read-write primary)
+which the Keycloak CR (templates/keycloak.yaml) references. Requires the
+CloudNativePG operator installed cluster-wide (see README).
+*/ -}}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.db.cloudnativepg.clusterName }}
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.db.cloudnativepg.instances }}
+  {{- with .Values.db.cloudnativepg.imageName }}
+  imageName: {{ . | quote }}
+  {{- end }}
+  storage:
+    size: {{ .Values.db.cloudnativepg.storage.size | quote }}
+    {{- with .Values.db.cloudnativepg.storage.storageClass }}
+    storageClass: {{ . | quote }}
+    {{- end }}
+  bootstrap:
+    initdb:
+      database: {{ .Values.db.database }}
+      owner: {{ .Values.db.cloudnativepg.owner }}
+{{- end }}

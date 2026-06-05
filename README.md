@@ -17,11 +17,16 @@ blueprint) from *config* (the KOG).
 
 - a `Keycloak` CR (instances, hostname, DB, http/TLS, ingress, proxy headers,
   bootstrap admin)
-- a DB credentials `Secret` (dev convenience; reference an external/ESO-synced
-  Secret in production via `db.secret.create=false`)
+- the **database**, per `db.provider`:
+  - `cloudnativepg` (default) — a CloudNativePG `Cluster` CR; CNPG provisions the
+    Postgres, the `keycloak` database + owner role, and the `<cluster>-app`
+    credentials Secret + `<cluster>-rw` Service that the Keycloak CR consumes.
+  - `external` — bring your own reachable Postgres; the chart renders a DB
+    credentials `Secret` (dev convenience; set `db.secret.create=false` to
+    reference an external/ESO-synced one).
 - a bootstrap-admin `Secret`
 
-It deliberately does **not** bundle the Operator itself.
+It deliberately does **not** bundle either operator.
 
 ## Prerequisite: install the Operator once
 
@@ -40,6 +45,23 @@ kubectl apply -n keycloak-system -f https://raw.githubusercontent.com/keycloak/k
 See https://www.keycloak.org/operator/installation for exact per-release URLs.
 Verified end-to-end on kind with operator **26.6.3** (these exact URLs).
 
+## Prerequisite: install CloudNativePG (default `db.provider`)
+
+With the default `db.provider: cloudnativepg`, the CNPG operator must also be
+installed once cluster-wide:
+
+```bash
+kubectl apply --server-side -f \
+  https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.29/releases/cnpg-1.29.1.yaml
+```
+
+The blueprint then renders a `Cluster` named `db.cloudnativepg.clusterName`
+(default `keycloak-db`); CNPG creates the `keycloak-db-app` Secret and
+`keycloak-db-rw` Service, and the `Keycloak` CR is wired to them automatically.
+Validated end-to-end on kind with **CNPG 1.29.1** + Keycloak 26.6.3 (Keycloak
+migrated its 90-table schema into the CNPG database). For `external` mode set
+`--set db.provider=external` and provide `db.host` + `db.secret`.
+
 ## Known constraint: operator startup probe on constrained nodes
 
 On memory-constrained nodes the operator's Quarkus pod can fail its default
@@ -51,11 +73,11 @@ kubectl -n keycloak-system patch deploy keycloak-operator --type=json \
   -p='[{"op":"replace","path":"/spec/template/spec/containers/0/startupProbe/failureThreshold","value":30}]'
 ```
 
-The Keycloak **server** pod also needs a real DB (Postgres) reachable at
-`db.host`; with `db.secret.create=true` the chart's generated credentials must
-match the DB. Set `hostname-strict=false` (via `keycloak.additionalOptions`) when
-clients call the server by its in-cluster Service name rather than the public
-hostname.
+The Keycloak **server** needs a Postgres: in the default `cloudnativepg` mode
+CNPG provisions it; in `external` mode it must be reachable at `db.host` with
+credentials in `db.secret`. Set `hostname-strict=false` (via
+`keycloak.additionalOptions`) when clients call the server by its in-cluster
+Service name rather than the public hostname.
 
 ## Hand-off to keycloak-config-kog
 

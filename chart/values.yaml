@@ -34,9 +34,28 @@ keycloak:
 # ---------------------------------------------------------------------------
 db:
   vendor: postgres
+  database: keycloak
+
+  # How the Postgres backing store is provided:
+  #   cloudnativepg - the chart renders a CloudNativePG `Cluster` CR; CNPG creates
+  #                   the database, owner role, and a `<cluster>-app` Secret, and a
+  #                   `<cluster>-rw` Service. The CNPG operator must be installed.
+  #   external      - bring your own reachable Postgres (set host + secret below).
+  provider: cloudnativepg
+
+  # --- cloudnativepg mode ---
+  cloudnativepg:
+    clusterName: keycloak-db
+    instances: 1            # >=3 for HA in production
+    owner: keycloak         # role that owns `database`; also the -app Secret username
+    imageName: ""           # pin e.g. ghcr.io/cloudnative-pg/postgresql:17; "" = CNPG default
+    storage:
+      size: 1Gi
+      storageClass: ""      # "" = cluster default
+
+  # --- external mode ---
   host: keycloak-postgres
   port: 5432
-  database: keycloak
   # Credentials are read from a Secret. If create=true the chart renders one
   # from the literals below (dev only); in production reference an existing
   # Secret (e.g. one synced by External Secrets Operator) and set create=false.

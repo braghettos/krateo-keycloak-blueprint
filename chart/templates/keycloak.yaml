@@ -11,15 +11,26 @@ spec:
   {{- end }}
   db:
     vendor: {{ .Values.db.vendor }}
+    database: {{ .Values.db.database }}
+    {{- if eq .Values.db.provider "cloudnativepg" }}
+    host: {{ .Values.db.cloudnativepg.clusterName }}-rw
+    port: 5432
+    usernameSecret:
+      name: {{ .Values.db.cloudnativepg.clusterName }}-app
+      key: username
+    passwordSecret:
+      name: {{ .Values.db.cloudnativepg.clusterName }}-app
+      key: password
+    {{- else }}
     host: {{ .Values.db.host }}
     port: {{ .Values.db.port }}
-    database: {{ .Values.db.database }}
     usernameSecret:
       name: {{ .Values.db.secret.name }}
       key: {{ .Values.db.secret.usernameKey }}
     passwordSecret:
       name: {{ .Values.db.secret.name }}
       key: {{ .Values.db.secret.passwordKey }}
+    {{- end }}
   http:
     httpEnabled: {{ .Values.keycloak.http.httpEnabled }}
     {{- with .Values.keycloak.http.tlsSecretName }}
