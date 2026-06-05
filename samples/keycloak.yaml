@@ -1,0 +1,31 @@
+# Sample Krateo Composition that instantiates the Keycloak blueprint.
+# Apply after the CompositionDefinition (compositiondefinition.yaml) is registered.
+apiVersion: composition.krateo.io/v1alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: keycloak-system
+spec:
+  keycloak:
+    name: keycloak
+    instances: 1
+    hostname: "keycloak.example.com"
+    http:
+      httpEnabled: true
+    ingress:
+      enabled: true
+    proxyHeaders: "xforwarded"
+  db:
+    vendor: postgres
+    host: keycloak-postgres
+    database: keycloak
+    secret:
+      create: false          # reference an externally-managed Secret in prod
+      name: keycloak-db
+      usernameKey: username
+      passwordKey: password
+  bootstrapAdmin:
+    enabled: true
+    secret:
+      create: false
+      name: keycloak-bootstrap-admin

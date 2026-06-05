@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Keycloak server instance (managed by the official Keycloak Operator)
+# ---------------------------------------------------------------------------
+keycloak:
+  name: keycloak
+  instances: 1
+  # External hostname users (and the Keystone/Krateo OIDC clients) reach.
+  # MUST be a stable HTTPS hostname — federation is very hostname-sensitive.
+  hostname: "keycloak.example.com"
+  # Image override (defaults to the operator's pinned Keycloak image when empty).
+  image: ""
+
+  http:
+    # For production, terminate TLS at Keycloak with a cert Secret. For an
+    # ingress/Gateway that terminates TLS upstream, set httpEnabled=true and
+    # leave tlsSecret empty (and configure proxy headers).
+    httpEnabled: true
+    tlsSecretName: ""
+
+  ingress:
+    enabled: true
+    className: ""
+
+  # Proxy mode when TLS is terminated in front of Keycloak (edge|reencrypt|passthrough).
+  proxyHeaders: "xforwarded"
+
+  # Extra Keycloak options rendered into spec.additionalOptions.
+  additionalOptions: []
+  #  - name: metrics-enabled
+  #    value: "true"
+
+# ---------------------------------------------------------------------------
+# Database
+# ---------------------------------------------------------------------------
+db:
+  vendor: postgres
+  host: keycloak-postgres
+  port: 5432
+  database: keycloak
+  # Credentials are read from a Secret. If create=true the chart renders one
+  # from the literals below (dev only); in production reference an existing
+  # Secret (e.g. one synced by External Secrets Operator) and set create=false.
+  secret:
+    create: true
+    name: keycloak-db
+    usernameKey: username
+    passwordKey: password
+    username: keycloak
+    password: "change-me"
+
+# ---------------------------------------------------------------------------
+# Bootstrap admin (temporary, for first login + creating the KOG service account)
+# ---------------------------------------------------------------------------
+bootstrapAdmin:
+  enabled: true
+  secret:
+    create: true
+    name: keycloak-bootstrap-admin
+    username: admin
+    password: "change-me"
+
+# Install the Keycloak Operator + CRDs as part of this release. Default false:
+# the operator is normally a cluster-wide prerequisite applied once (see README).
+operator:
+  install: false
+  version: "26.0.0"

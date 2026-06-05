@@ -1,0 +1,17 @@
+apiVersion: v2
+name: keycloak
+description: >-
+  Krateo blueprint that deploys and manages a Keycloak server via the official
+  Keycloak Operator (CRD k8s.keycloak.org/v2alpha1). Renders the Keycloak CR plus
+  its DB / bootstrap-admin Secrets. The Operator itself is installed once as a
+  cluster prerequisite (see README); this blueprint owns the server instance and
+  is the identity backplane for the Krateo + OpenStack Horizon SSO.
+type: application
+version: 0.1.0
+appVersion: "26.0"
+home: https://www.keycloak.org/operator/installation
+icon: https://www.keycloak.org/resources/images/keycloak_logo_480x108.png
+sources:
+  - https://github.com/keycloak/keycloak/tree/main/operator
+maintainers:
+  - name: braghettos

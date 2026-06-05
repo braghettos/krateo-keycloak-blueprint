@@ -1,0 +1,25 @@
+Keycloak server "{{ .Values.keycloak.name }}" requested ({{ .Values.keycloak.instances }} instance(s)).
+
+PREREQUISITE — the Keycloak Operator must already be installed cluster-wide.
+This blueprint renders the Keycloak CR + Secrets but does NOT bundle the operator.
+Install it once (per release version) with:
+
+  kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak/{{ .Values.operator.version }}/operator/...keycloaks.k8s.keycloak.org-v1.yml
+  kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak/{{ .Values.operator.version }}/operator/...keycloakrealmimports.k8s.keycloak.org-v1.yml
+  kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak/{{ .Values.operator.version }}/operator/...kubernetes.yml
+
+(See https://www.keycloak.org/operator/installation for the exact per-release URLs.)
+
+Next:
+  1. Wait for the server:  kubectl get keycloak {{ .Values.keycloak.name }} -o jsonpath='{.status.conditions}'
+  2. Reach it at:          https://{{ .Values.keycloak.hostname }}
+  3. Create the KOG service-account client (krateo-kog) and hand its secret to
+     keycloak-config-kog (the configuration KOG), then apply the realm CRs.
+
+{{- if eq .Values.db.secret.password "change-me" }}
+
+WARNING: db.secret.password is still the default "change-me" — override it.
+{{- end }}
+{{- if and .Values.bootstrapAdmin.enabled (eq .Values.bootstrapAdmin.secret.password "change-me") }}
+WARNING: bootstrapAdmin.secret.password is still the default "change-me" — override it.
+{{- end }}

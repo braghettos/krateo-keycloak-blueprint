@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Keycloak (Operator-managed) blueprint values",
+  "type": "object",
+  "properties": {
+    "keycloak": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "instances": { "type": "integer", "minimum": 1 },
+        "hostname": { "type": "string", "description": "Stable external HTTPS hostname." },
+        "image": { "type": "string" },
+        "http": {
+          "type": "object",
+          "properties": {
+            "httpEnabled": { "type": "boolean" },
+            "tlsSecretName": { "type": "string" }
+          }
+        },
+        "ingress": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "className": { "type": "string" }
+          }
+        },
+        "proxyHeaders": { "type": "string", "enum": ["", "forwarded", "xforwarded"] },
+        "additionalOptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+            "required": ["name", "value"]
+          }
+        }
+      },
+      "required": ["name", "instances", "hostname"]
+    },
+    "db": {
+      "type": "object",
+      "properties": {
+        "vendor": { "type": "string" },
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "database": { "type": "string" },
+        "secret": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "usernameKey": { "type": "string" },
+            "passwordKey": { "type": "string" },
+            "username": { "type": "string" },
+            "password": { "type": "string" }
+          },
+          "required": ["name", "usernameKey", "passwordKey"]
+        }
+      },
+      "required": ["vendor", "host", "database", "secret"]
+    },
+    "bootstrapAdmin": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "secret": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "username": { "type": "string" },
+            "password": { "type": "string" }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "properties": {
+        "install": { "type": "boolean" },
+        "version": { "type": "string" }
+      }
+    }
+  },
+  "required": ["keycloak", "db"]
+}
