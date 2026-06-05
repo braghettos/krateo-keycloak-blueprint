@@ -60,7 +60,7 @@ the server the blueprint stands up.
 ## Status
 
 Both charts `helm lint` clean and `helm template` to valid manifests. The KOG's
-runtime behaviour against `rest-dynamic-controller` is **not yet validated** —
+runtime behaviour is **validated for `KeycloakClient`** (create/findby/update on a live kind cluster; other five RDs share the proven pattern) —
 see the krateo-keycloak-operator-kog README → "Validation status" for the spike checklist
 (start with `KeycloakClient` only). `_reference/` holds the upstream OAS and the
 asset generator.
