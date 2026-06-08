@@ -265,6 +265,9 @@ single IdP; the remaining work is on the consumers:
   the `keystone` client and enable Horizon WebSSO — both already templated in the
   `openstack-as-a-service` Keystone/Horizon charts.
 
+➡️ **The full chain — ending in a Krateo Markdown widget whose link opens Horizon
+already logged in — is assembled in [`demo/sso-end-to-end/`](demo/sso-end-to-end/).**
+
 ---
 
 ## Cleanup
