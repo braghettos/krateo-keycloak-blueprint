@@ -27,7 +27,11 @@ spec:
         size: 1Gi
     # For an existing DB instead, set provider: external and uncomment:
     # host: my-postgres
-    # secret: { create: false, name: keycloak-db, usernameKey: username, passwordKey: password }
+    # secret:
+    #   create: false
+    #   name: keycloak-db
+    #   usernameKey: username
+    #   passwordKey: password
   bootstrapAdmin:
     enabled: true
     secret:

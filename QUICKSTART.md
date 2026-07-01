@@ -155,25 +155,53 @@ kubectl apply -f - <<'YAML'
 # Auth config every resource points at (one per Kind; all share the token Secret)
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakRealmConfiguration
-metadata: { name: keycloak-admin, namespace: krateo-system }
-spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
+metadata:
+  name: keycloak-admin
+  namespace: krateo-system
+spec:
+  authentication:
+    bearer:
+      tokenRef:
+        name: keycloak-admin-token
+        namespace: krateo-system
+        key: token
 ---
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakClientConfiguration
-metadata: { name: keycloak-admin, namespace: krateo-system }
-spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
+metadata:
+  name: keycloak-admin
+  namespace: krateo-system
+spec:
+  authentication:
+    bearer:
+      tokenRef:
+        name: keycloak-admin-token
+        namespace: krateo-system
+        key: token
 ---
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakGroupConfiguration
-metadata: { name: keycloak-admin, namespace: krateo-system }
-spec: { authentication: { bearer: { tokenRef: { name: keycloak-admin-token, namespace: krateo-system, key: token } } } }
+metadata:
+  name: keycloak-admin
+  namespace: krateo-system
+spec:
+  authentication:
+    bearer:
+      tokenRef:
+        name: keycloak-admin-token
+        namespace: krateo-system
+        key: token
 ---
 # The realm
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakRealm
-metadata: { name: krateo, namespace: krateo-system }
+metadata:
+  name: krateo
+  namespace: krateo-system
 spec:
-  configurationRef: { name: keycloak-admin, namespace: krateo-system }
+  configurationRef:
+    name: keycloak-admin
+    namespace: krateo-system
   realm: krateo
   enabled: true
   displayName: "Krateo PlatformOps"
@@ -184,9 +212,13 @@ spec:
 # Keystone (Horizon WebSSO) federation client
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakClient
-metadata: { name: keystone, namespace: krateo-system }
+metadata:
+  name: keystone
+  namespace: krateo-system
 spec:
-  configurationRef: { name: keycloak-admin, namespace: krateo-system }
+  configurationRef:
+    name: keycloak-admin
+    namespace: krateo-system
   realm: krateo
   clientId: keystone
   name: "OpenStack Keystone (Horizon WebSSO)"
@@ -213,9 +245,13 @@ spec:
 # Krateo portal login client
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakClient
-metadata: { name: krateo-authn, namespace: krateo-system }
+metadata:
+  name: krateo-authn
+  namespace: krateo-system
 spec:
-  configurationRef: { name: keycloak-admin, namespace: krateo-system }
+  configurationRef:
+    name: keycloak-admin
+    namespace: krateo-system
   realm: krateo
   clientId: krateo-authn
   name: "Krateo AuthN"
@@ -224,20 +260,27 @@ spec:
   publicClient: false
   standardFlowEnabled: true
   clientAuthenticatorType: client-secret
-  redirectUris: [ "https://<KRATEO_HOST>/auth/oidc" ]
+  redirectUris:
+    - "https://<KRATEO_HOST>/auth/oidc"
 ---
 # An OpenStack project group; the Keystone mapping turns membership into a
 # project/role grant.
 apiVersion: keycloak.ogen.krateo.io/v1alpha1
 kind: KeycloakGroup
-metadata: { name: os-project-demo, namespace: krateo-system }
+metadata:
+  name: os-project-demo
+  namespace: krateo-system
 spec:
-  configurationRef: { name: keycloak-admin, namespace: krateo-system }
+  configurationRef:
+    name: keycloak-admin
+    namespace: krateo-system
   realm: krateo
   name: os-project-demo
   attributes:
-    openstack-project: ["demo"]
-    openstack-role: ["member"]
+    openstack-project:
+      - demo
+    openstack-role:
+      - member
 YAML
 ```
 
