@@ -122,10 +122,16 @@ kubectl -n krateo-system create secret generic keycloak-admin-token --from-liter
 
 Create a confidential **service-account client** `krateo-kog` (with the
 `realm-management` roles you need — e.g. `manage-clients`, `manage-realm`) and
-put its secret in a `keycloak-kog-client` Secret. The KOG chart's
-`auth.externalSecret` then has External Secrets Operator mint and rotate a fresh
-token into `keycloak-admin-token` automatically. See the KOG chart's
-`templates/externalsecret.yaml`.
+put its secret in a `keycloak-kog-client` Secret. That Secret **must** carry the
+label ESO requires for webhook generators:
+
+```bash
+kubectl -n krateo-system label secret keycloak-kog-client external-secrets.io/type=webhook
+```
+
+The KOG chart's `auth.externalSecret` then has External Secrets Operator mint and
+rotate a fresh token into `keycloak-admin-token` automatically (validated on ESO
+≥ 0.19). See the KOG chart's `templates/externalsecret.yaml`.
 
 ---
 
